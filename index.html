@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forholdsteller | Verdensfineste</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="floating-hearts" aria-hidden="true">
+    <span class="heart heart-1">&hearts;</span>
+    <span class="heart heart-2">&hearts;</span>
+    <span class="heart heart-3">&hearts;</span>
+    <span class="heart heart-4">&hearts;</span>
+    <span class="heart heart-5">&hearts;</span>
+    <span class="heart heart-6">&hearts;</span>
+  </div>
+
+  <div class="page-shell">
+    <main class="container">
+      <section class="hero-card">
+        <p class="eyebrow">Forholdsteller</p>
+        <h1>Verdensfineste</h1>
+        <p class="hero-copy">
+          En enkel liten forside som teller hvert sekund siden mandag 19. januar 2026 kl. 20:00.
+        </p>
+
+        <div class="start-chip">
+          <span>Sammen siden</span>
+          <strong id="relationship-start-text">19. januar 2026 kl. 20:00</strong>
+        </div>
+
+        <section class="counter-card" aria-labelledby="relationship-title">
+          <div class="counter-heading">
+            <div>
+              <p class="eyebrow">Live teller</p>
+              <h2 id="relationship-title">Hvor lenge vi har v&aelig;rt sammen</h2>
+            </div>
+            <p class="counter-note" id="relationship-status">Oppdateres hvert sekund.</p>
+          </div>
+
+          <div class="hero-counter">
+            <article class="counter-box">
+              <strong class="counter-value" id="relationship-days">0</strong>
+              <span class="counter-label">Dager</span>
+            </article>
+            <article class="counter-box">
+              <strong class="counter-value" id="relationship-hours">00</strong>
+              <span class="counter-label">Timer</span>
+            </article>
+            <article class="counter-box">
+              <strong class="counter-value" id="relationship-minutes">00</strong>
+              <span class="counter-label">Minutter</span>
+            </article>
+            <article class="counter-box">
+              <strong class="counter-value" id="relationship-seconds">00</strong>
+              <span class="counter-label">Sekunder</span>
+            </article>
+          </div>
+        </section>
+
+        <div class="hero-actions">
+          <button class="secret-button" id="secret-button" type="button">Hemmelig omr&#229;de</button>
+          <p class="tiny-note">Trykk for &aring; &aring;pne det skjulte innholdet med kode.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="secret-modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="secret-title">
+      <button class="modal-close" id="modal-close" type="button" aria-label="Lukk">&times;</button>
+
+      <section class="unlock-view" id="unlock-view">
+        <p class="eyebrow">Privat</p>
+        <h2 id="secret-title">Hemmelig omr&#229;de</h2>
+        <p class="modal-copy">
+          Skriv inn riktig kode for &aring; &aring;pne bursdagsnedtelling, jubileumer og blomsterp&aring;minnelser.
+        </p>
+
+        <form class="secret-form" id="secret-form">
+          <label class="field-label" for="secret-code">Kode</label>
+          <div class="field-row">
+            <input
+              class="secret-input"
+              id="secret-code"
+              name="secret-code"
+              type="password"
+              autocomplete="off"
+              placeholder="Skriv inn koden"
+            >
+            <button class="unlock-button" type="submit">&Aring;pne</button>
+          </div>
+          <p class="error-message" id="secret-error" hidden aria-live="polite">Feil kode. Pr&oslash;v igjen.</p>
+        </form>
+      </section>
+
+      <section class="secret-view" id="secret-view" hidden>
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">L&aring;st opp</p>
+            <h2>Bare for dere to</h2>
+          </div>
+          <p class="modal-copy">
+            Her ligger alt det romantiske som ikke trenger &aring; st&aring; p&aring; forsiden.
+          </p>
+        </div>
+
+        <div class="secret-grid">
+          <article class="secret-panel">
+            <p class="panel-kicker">Neste feiring</p>
+            <h3>Nedtelling til bursdagen hennes</h3>
+            <p class="panel-date" id="birthday-date">2. oktober</p>
+
+            <div class="mini-counter">
+              <div class="mini-counter-box">
+                <strong id="birthday-days">0</strong>
+                <span>Dager</span>
+              </div>
+              <div class="mini-counter-box">
+                <strong id="birthday-hours">00</strong>
+                <span>Timer</span>
+              </div>
+              <div class="mini-counter-box">
+                <strong id="birthday-minutes">00</strong>
+                <span>Minutter</span>
+              </div>
+              <div class="mini-counter-box">
+                <strong id="birthday-seconds">00</strong>
+                <span>Sekunder</span>
+              </div>
+            </div>
+
+            <p class="panel-note" id="birthday-note">Neste bursdag kommer snart.</p>
+          </article>
+
+          <article class="secret-panel">
+            <p class="panel-kicker">Neste milep&aelig;l</p>
+            <h3 id="anniversary-name">1 uke</h3>
+            <p class="panel-date" id="anniversary-date">26. januar 2026 kl. 20:00</p>
+            <p class="panel-note" id="anniversary-remaining">7 dager igjen</p>
+          </article>
+
+          <article class="secret-panel secret-panel-wide">
+            <div class="panel-split">
+              <div>
+                <p class="panel-kicker">Blomsterp&aring;minnelser</p>
+                <h3 id="flower-name">Hver m&aring;ned den 19.</h3>
+                <p class="panel-date" id="flower-date">19. juni 2026</p>
+                <p class="panel-note" id="flower-remaining">0 dager igjen</p>
+              </div>
+
+              <div>
+                <p class="panel-kicker">Huskedager</p>
+                <ul class="rules-list">
+                  <li>Hver m&aring;ned den 19.</li>
+                  <li>1 uke f&oslash;r bursdagen hennes</li>
+                  <li>P&aring; bursdagen hennes</li>
+                  <li>1 uke f&oslash;r &aring;rsdag</li>
+                  <li>P&aring; &aring;rsdag</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="secret-panel secret-panel-wide">
+            <div class="timeline-heading">
+              <div>
+                <p class="panel-kicker">Jubileumer</p>
+                <h3>Planlagte milep&aelig;ler</h3>
+              </div>
+              <p class="timeline-copy">
+                Alle datoene regnes fra mandag 19. januar 2026 kl. 20:00.
+              </p>
+            </div>
+            <ul class="timeline-list" id="milestone-list"></ul>
+          </article>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
