@@ -1,6 +1,10 @@
 "use strict";
 
+// Enkel klientbeskyttelse: koden ligger i klienten og er ikke ekte sikkerhet.
 const SECRET_CODE = "Linda1976";
+const ORDER_ACCESS_STORAGE_KEY = "orderAccessGranted";
+const ORDER_ACCESS_STORAGE_VALUE = "granted";
+const ORDER_PAGE_PATH = "bestilling.html";
 const RELATIONSHIP_START = new Date(2026, 0, 19, 20, 0, 0);
 const BIRTHDAY_MONTH_INDEX = 9;
 const BIRTHDAY_DAY = 2;
@@ -62,6 +66,7 @@ const elements = {
   relationshipMinutes: document.getElementById("relationship-minutes"),
   relationshipSeconds: document.getElementById("relationship-seconds"),
   secretButton: document.getElementById("secret-button"),
+  orderButton: document.getElementById("order-button"),
   modal: document.getElementById("secret-modal"),
   modalClose: document.getElementById("modal-close"),
   unlockView: document.getElementById("unlock-view"),
@@ -69,6 +74,11 @@ const elements = {
   secretForm: document.getElementById("secret-form"),
   secretInput: document.getElementById("secret-code"),
   secretError: document.getElementById("secret-error"),
+  orderModal: document.getElementById("order-modal"),
+  orderModalClose: document.getElementById("order-modal-close"),
+  orderForm: document.getElementById("order-form"),
+  orderInput: document.getElementById("order-code"),
+  orderError: document.getElementById("order-error"),
   birthdayDate: document.getElementById("birthday-date"),
   birthdayDays: document.getElementById("birthday-days"),
   birthdayHours: document.getElementById("birthday-hours"),
@@ -421,6 +431,36 @@ function closeModal() {
   resetSecretState();
 }
 
+function resetOrderState() {
+  elements.orderForm.reset();
+  elements.orderError.hidden = true;
+}
+
+function openOrderModal() {
+  resetOrderState();
+  elements.orderModal.classList.add("is-open");
+  elements.orderModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("is-modal-open");
+  window.setTimeout(() => {
+    elements.orderInput.focus();
+  }, 20);
+}
+
+function closeOrderModal() {
+  elements.orderModal.classList.remove("is-open");
+  elements.orderModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("is-modal-open");
+  resetOrderState();
+}
+
+function grantOrderAccess() {
+  try {
+    window.sessionStorage.setItem(ORDER_ACCESS_STORAGE_KEY, ORDER_ACCESS_STORAGE_VALUE);
+  } catch (error) {
+    // Hvis sessionStorage ikke er tilgjengelig, fortsetter vi likevel til den statiske siden.
+  }
+}
+
 function unlockSecret(inputCode) {
   if (inputCode.trim() !== SECRET_CODE) {
     elements.secretError.hidden = false;
@@ -433,6 +473,18 @@ function unlockSecret(inputCode) {
   elements.secretView.hidden = false;
 }
 
+function unlockOrder(inputCode) {
+  if (inputCode.trim() !== SECRET_CODE) {
+    elements.orderError.hidden = false;
+    elements.orderInput.select();
+    return;
+  }
+
+  elements.orderError.hidden = true;
+  grantOrderAccess();
+  window.location.href = ORDER_PAGE_PATH;
+}
+
 function updatePage() {
   const now = new Date();
   updateRelationship(now);
@@ -442,19 +494,35 @@ function updatePage() {
 }
 
 elements.secretButton.addEventListener("click", openModal);
+elements.orderButton.addEventListener("click", openOrderModal);
 elements.modalClose.addEventListener("click", closeModal);
+elements.orderModalClose.addEventListener("click", closeOrderModal);
 elements.secretForm.addEventListener("submit", (event) => {
   event.preventDefault();
   unlockSecret(elements.secretInput.value);
+});
+elements.orderForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  unlockOrder(elements.orderInput.value);
 });
 elements.modal.addEventListener("click", (event) => {
   if (event.target === elements.modal) {
     closeModal();
   }
 });
+elements.orderModal.addEventListener("click", (event) => {
+  if (event.target === elements.orderModal) {
+    closeOrderModal();
+  }
+});
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && elements.modal.classList.contains("is-open")) {
     closeModal();
+    return;
+  }
+
+  if (event.key === "Escape" && elements.orderModal.classList.contains("is-open")) {
+    closeOrderModal();
   }
 });
 

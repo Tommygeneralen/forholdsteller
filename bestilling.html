@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bestill noe fint | Verdensfineste</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="bestilling.js" defer></script>
+</head>
+<body>
+  <div class="floating-hearts" aria-hidden="true">
+    <span class="heart heart-1">&hearts;</span>
+    <span class="heart heart-2">&hearts;</span>
+    <span class="heart heart-3">&hearts;</span>
+    <span class="heart heart-4">&hearts;</span>
+    <span class="heart heart-5">&hearts;</span>
+    <span class="heart heart-6">&hearts;</span>
+  </div>
+
+  <div class="page-shell">
+    <main class="container order-container">
+      <section class="hero-card order-hero">
+        <a class="back-link" href="index.html">&larr; Tilbake til forsiden</a>
+        <p class="eyebrow">Privat bestilling</p>
+        <h1>Bestill noe fint &#10084;&#65039;</h1>
+        <p class="hero-copy order-copy">
+          Velg det du &oslash;nsker, dato og tid, s&aring; sendes bestillingen.
+        </p>
+
+        <form class="order-request-form" id="order-request-form">
+          <input type="hidden" name="_subject" value="Ny bestilling fra nettsiden">
+          <input type="hidden" name="mottaker" value="t-nyste@online.no">
+          <input type="hidden" name="valgte_tjenester" id="selected-services-field">
+          <input type="hidden" name="undervalg" id="selected-details-field">
+          <input type="hidden" name="bestillingoversikt" id="order-summary-field">
+
+          <div class="order-form-grid">
+            <section class="form-panel" aria-labelledby="order-details-title">
+              <div class="timeline-heading">
+                <div>
+                  <p class="panel-kicker">Detaljer</p>
+                  <h2 id="order-details-title">Dato, tid og navn</h2>
+                </div>
+                <p class="timeline-copy">Fyll inn det grunnleggende f&oslash;rst.</p>
+              </div>
+
+              <label class="form-field" for="fornavn">
+                <span class="field-label">Fornavn</span>
+                <input class="text-input" id="fornavn" name="fornavn" type="text" required>
+              </label>
+
+              <div class="field-cluster">
+                <label class="form-field" for="dato">
+                  <span class="field-label">Dato</span>
+                  <input class="text-input" id="dato" name="dato" type="date" required>
+                </label>
+
+                <label class="form-field" for="klokkeslett">
+                  <span class="field-label">Klokkeslett</span>
+                  <input class="text-input" id="klokkeslett" name="klokkeslett" type="time" required>
+                </label>
+              </div>
+
+              <label class="form-field" for="ekstra-melding">
+                <span class="field-label">Ekstra melding</span>
+                <textarea
+                  class="text-area"
+                  id="ekstra-melding"
+                  name="ekstra_melding"
+                  rows="5"
+                  placeholder="Skriv noe fint eller praktisk her"
+                ></textarea>
+              </label>
+            </section>
+
+            <section class="form-panel" aria-labelledby="order-summary-title">
+              <div>
+                <p class="panel-kicker">Oversikt</p>
+                <h2 id="order-summary-title">Valgt s&aring; langt</h2>
+              </div>
+              <p class="panel-copy">
+                Du kan velge flere tjenester og menyer i samme bestilling.
+              </p>
+
+              <ul class="order-summary-list" id="selection-preview">
+                <li class="summary-empty">Ingen tjenester valgt enn&aring;.</li>
+              </ul>
+
+              <div class="status-message is-info" id="config-message" hidden aria-live="polite"></div>
+              <div class="status-message" id="form-status" hidden aria-live="polite"></div>
+            </section>
+          </div>
+
+          <section class="form-panel services-shell" aria-labelledby="services-title">
+            <div class="timeline-heading">
+              <div>
+                <p class="panel-kicker">Tjenester</p>
+                <h2 id="services-title">Velg det du &oslash;nsker</h2>
+              </div>
+              <p class="timeline-copy">Undervalg blir tilgjengelige n&aring;r tjenesten er valgt.</p>
+            </div>
+
+            <div class="service-grid">
+              <article class="service-card" data-service-card>
+                <label class="service-toggle" for="service-dinner">
+                  <input type="checkbox" id="service-dinner" name="services[]" value="Middag hjemme">
+                  <span class="service-copy">
+                    <strong class="service-title">Middag hjemme</strong>
+                    <span>Velg meny, dessert og om kokken skal v&aelig;re med eller uten kl&aelig;r.</span>
+                  </span>
+                </label>
+
+                <div class="service-options" data-options-for="service-dinner">
+                  <div class="option-group">
+                    <p class="option-group-title">Meny</p>
+                    <div class="choice-row">
+                      <label class="choice-chip" for="dinner-pizza">
+                        <input type="checkbox" id="dinner-pizza" name="dinner_menu[]" value="Pizza">
+                        Pizza
+                      </label>
+                      <label class="choice-chip" for="dinner-together">
+                        <input type="checkbox" id="dinner-together" name="dinner_menu[]" value="Middag sammen">
+                        Middag sammen
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="option-group">
+                    <p class="option-group-title">Kokken</p>
+                    <div class="choice-row">
+                      <label class="choice-chip" for="cook-clothes-med">
+                        <input type="radio" id="cook-clothes-med" name="cook_clothes" value="Med">
+                        Med
+                      </label>
+                      <label class="choice-chip" for="cook-clothes-uten">
+                        <input type="radio" id="cook-clothes-uten" name="cook_clothes" value="Uten">
+                        Uten
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="option-group">
+                    <p class="option-group-title">Dessert</p>
+                    <div class="choice-row">
+                      <label class="choice-chip" for="dessert-yes">
+                        <input type="radio" id="dessert-yes" name="dessert" value="Ja">
+                        Ja
+                      </label>
+                      <label class="choice-chip" for="dessert-no">
+                        <input type="radio" id="dessert-no" name="dessert" value="Nei">
+                        Nei
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="service-card" data-service-card>
+                <label class="service-toggle" for="service-cinema">
+                  <input type="checkbox" id="service-cinema" name="services[]" value="Kino-date">
+                  <span class="service-copy">
+                    <strong class="service-title">Kino-date</strong>
+                    <span>En enkel kveld ute med film og tid sammen.</span>
+                  </span>
+                </label>
+              </article>
+
+              <article class="service-card" data-service-card>
+                <label class="service-toggle" for="service-massage">
+                  <input type="checkbox" id="service-massage" name="services[]" value="Massasje">
+                  <span class="service-copy">
+                    <strong class="service-title">Massasje</strong>
+                    <span>Velg en eller flere typer massasje og om du vil ha happy ending.</span>
+                  </span>
+                </label>
+
+                <div class="service-options" data-options-for="service-massage">
+                  <div class="option-group">
+                    <p class="option-group-title">Type massasje</p>
+                    <div class="choice-row">
+                      <label class="choice-chip" for="massage-full">
+                        <input type="checkbox" id="massage-full" name="massage_type[]" value="Full kroppsmassasje">
+                        Full kroppsmassasje
+                      </label>
+                      <label class="choice-chip" for="massage-feet">
+                        <input type="checkbox" id="massage-feet" name="massage_type[]" value="Fotmassasje">
+                        Fotmassasje
+                      </label>
+                      <label class="choice-chip" for="massage-legs">
+                        <input type="checkbox" id="massage-legs" name="massage_type[]" value="Benmassasje">
+                        Benmassasje
+                      </label>
+                      <label class="choice-chip" for="massage-back">
+                        <input type="checkbox" id="massage-back" name="massage_type[]" value="Ryggmassasje">
+                        Ryggmassasje
+                      </label>
+                      <label class="choice-chip" for="massage-front">
+                        <input type="checkbox" id="massage-front" name="massage_type[]" value="Frontmassasje">
+                        Frontmassasje
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="option-group">
+                    <p class="option-group-title">Happy ending</p>
+                    <div class="choice-row">
+                      <label class="choice-chip" for="happy-ending-yes">
+                        <input type="radio" id="happy-ending-yes" name="happy_ending" value="Ja">
+                        Ja
+                      </label>
+                      <label class="choice-chip" for="happy-ending-no">
+                        <input type="radio" id="happy-ending-no" name="happy_ending" value="Nei">
+                        Nei
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="service-card" data-service-card>
+                <label class="service-toggle" for="service-breakfast">
+                  <input type="checkbox" id="service-breakfast" name="services[]" value="Frokost p&#229; senga">
+                  <span class="service-copy">
+                    <strong class="service-title">Frokost p&aring; senga</strong>
+                    <span>Start dagen rolig med noe godt og en kaffebeslutning.</span>
+                  </span>
+                </label>
+
+                <div class="service-options" data-options-for="service-breakfast">
+                  <div class="option-group">
+                    <p class="option-group-title">Kaffe</p>
+                    <div class="choice-row">
+                      <label class="choice-chip" for="coffee-yes">
+                        <input type="radio" id="coffee-yes" name="coffee" value="Ja">
+                        Ja
+                      </label>
+                      <label class="choice-chip" for="coffee-no">
+                        <input type="radio" id="coffee-no" name="coffee" value="Nei">
+                        Nei
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="service-card" data-service-card>
+                <label class="service-toggle" for="service-surprise">
+                  <input type="checkbox" id="service-surprise" name="services[]" value="Overraskelse">
+                  <span class="service-copy">
+                    <strong class="service-title">Overraskelse</strong>
+                    <span>For n&aring;r du vil at resten skal f&aring; v&aelig;re hemmelig.</span>
+                  </span>
+                </label>
+              </article>
+            </div>
+          </section>
+
+          <div class="submit-row">
+            <p class="tiny-note">
+              Bestillingen sendes til <strong>t-nyste@online.no</strong> via Formspree n&aring;r endepunktet er lagt inn.
+            </p>
+            <button class="order-submit-button" id="submit-order-button" type="submit">Send bestilling</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

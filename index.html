@@ -62,7 +62,8 @@
 
         <div class="hero-actions">
           <button class="secret-button" id="secret-button" type="button">Hemmelig omr&#229;de</button>
-          <p class="tiny-note">Trykk for &aring; &aring;pne det skjulte innholdet med kode.</p>
+          <button class="order-button" id="order-button" type="button">Bestill noe fint &#10084;&#65039;</button>
+          <p class="tiny-note hero-note">Trykk for &aring; &aring;pne det skjulte innholdet med kode, eller l&aring;s opp bestillingssiden.</p>
         </div>
       </section>
     </main>
@@ -177,6 +178,36 @@
             <ul class="timeline-list" id="milestone-list"></ul>
           </article>
         </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="order-modal" aria-hidden="true">
+    <div class="modal-card modal-card-compact" role="dialog" aria-modal="true" aria-labelledby="order-title">
+      <button class="modal-close" id="order-modal-close" type="button" aria-label="Lukk">&times;</button>
+
+      <section class="unlock-view">
+        <p class="eyebrow">Privat bestilling</p>
+        <h2 id="order-title">Bestill noe fint &#10084;&#65039;</h2>
+        <p class="modal-copy">
+          Skriv inn koden for &aring; &aring;pne bestillingssiden. Dette er bare enkel klientbeskyttelse, ikke ekte sikkerhet.
+        </p>
+
+        <form class="secret-form" id="order-form">
+          <label class="field-label" for="order-code">Kode</label>
+          <div class="field-row">
+            <input
+              class="secret-input"
+              id="order-code"
+              name="order-code"
+              type="password"
+              autocomplete="off"
+              placeholder="Skriv inn koden"
+            >
+            <button class="unlock-button order-unlock-button" type="submit">&Aring;pne bestilling</button>
+          </div>
+          <p class="error-message" id="order-error" hidden aria-live="polite">Feil kode &#10084;&#65039; pr&oslash;v igjen</p>
+        </form>
       </section>
     </div>
   </div>
