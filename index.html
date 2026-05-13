@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forholdsteller | Verdensfineste</title>
+  <script>
+    // Dette er enkel klientbeskyttelse, ikke ekte sikkerhet.
+    (function () {
+      try {
+        if (window.sessionStorage.getItem("siteLoginGranted") === "granted") {
+          document.documentElement.classList.add("has-login-access");
+        }
+      } catch (error) {
+        document.documentElement.classList.remove("has-login-access");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -17,7 +29,52 @@
     <span class="heart heart-6">&hearts;</span>
   </div>
 
-  <div class="page-shell">
+  <div class="login-shell" id="login-shell">
+    <main class="login-container">
+      <section class="hero-card login-card" aria-labelledby="login-title">
+        <p class="eyebrow">Privat</p>
+        <h1 id="login-title">Logg inn</h1>
+        <p class="hero-copy">
+          Logg inn for &aring; se innholdet. Dette er enkel klientbeskyttelse, ikke ekte sikkerhet.
+        </p>
+
+        <form class="login-form" id="login-form">
+          <label class="form-field" for="login-username">
+            <span class="field-label">Brukernavn</span>
+            <input
+              class="text-input"
+              id="login-username"
+              name="login-username"
+              type="text"
+              autocomplete="off"
+              required
+            >
+          </label>
+
+          <label class="form-field" for="login-password">
+            <span class="field-label">Passord</span>
+            <input
+              class="text-input"
+              id="login-password"
+              name="login-password"
+              type="password"
+              autocomplete="off"
+              required
+            >
+          </label>
+
+          <div class="login-actions">
+            <button class="order-button" type="submit">Logg inn</button>
+            <p class="tiny-note login-note">Denne siden bruker enkel tilgangskode. Ikke send sensitiv informasjon.</p>
+          </div>
+
+          <p class="error-message" id="login-error" hidden aria-live="polite">Feil brukernavn eller passord ❤️</p>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="page-shell" id="site-content">
     <main class="container">
       <section class="hero-card">
         <p class="eyebrow">Forholdsteller</p>
@@ -63,7 +120,8 @@
         <div class="hero-actions">
           <button class="secret-button" id="secret-button" type="button">Hemmelig omr&#229;de</button>
           <button class="order-button" id="order-button" type="button">Bestill noe fint &#10084;&#65039;</button>
-          <p class="tiny-note hero-note">Trykk for &aring; &aring;pne det skjulte innholdet med kode, eller l&aring;s opp bestillingssiden.</p>
+          <button class="logout-button" id="logout-button" type="button">Logg ut</button>
+          <p class="tiny-note hero-note">Trykk for &aring; &aring;pne det skjulte innholdet eller g&aring; videre til bestillingssiden.</p>
         </div>
       </section>
     </main>
@@ -72,36 +130,11 @@
   <div class="modal-backdrop" id="secret-modal" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="secret-title">
       <button class="modal-close" id="modal-close" type="button" aria-label="Lukk">&times;</button>
-
-      <section class="unlock-view" id="unlock-view">
-        <p class="eyebrow">Privat</p>
-        <h2 id="secret-title">Hemmelig omr&#229;de</h2>
-        <p class="modal-copy">
-          Skriv inn riktig kode for &aring; &aring;pne bursdagsnedtelling, jubileumer og blomsterp&aring;minnelser.
-        </p>
-
-        <form class="secret-form" id="secret-form">
-          <label class="field-label" for="secret-code">Kode</label>
-          <div class="field-row">
-            <input
-              class="secret-input"
-              id="secret-code"
-              name="secret-code"
-              type="password"
-              autocomplete="off"
-              placeholder="Skriv inn koden"
-            >
-            <button class="unlock-button" type="submit">&Aring;pne</button>
-          </div>
-          <p class="error-message" id="secret-error" hidden aria-live="polite">Feil kode. Pr&oslash;v igjen.</p>
-        </form>
-      </section>
-
-      <section class="secret-view" id="secret-view" hidden>
+      <section class="secret-view" id="secret-view">
         <div class="modal-header">
           <div>
             <p class="eyebrow">L&aring;st opp</p>
-            <h2>Bare for dere to</h2>
+            <h2 id="secret-title">Bare for dere to</h2>
           </div>
           <p class="modal-copy">
             Her ligger alt det romantiske som ikke trenger &aring; st&aring; p&aring; forsiden.
@@ -178,36 +211,6 @@
             <ul class="timeline-list" id="milestone-list"></ul>
           </article>
         </div>
-      </section>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="order-modal" aria-hidden="true">
-    <div class="modal-card modal-card-compact" role="dialog" aria-modal="true" aria-labelledby="order-title">
-      <button class="modal-close" id="order-modal-close" type="button" aria-label="Lukk">&times;</button>
-
-      <section class="unlock-view">
-        <p class="eyebrow">Privat bestilling</p>
-        <h2 id="order-title">Bestill noe fint &#10084;&#65039;</h2>
-        <p class="modal-copy">
-          Skriv inn koden for &aring; &aring;pne bestillingssiden. Dette er bare enkel klientbeskyttelse, ikke ekte sikkerhet.
-        </p>
-
-        <form class="secret-form" id="order-form">
-          <label class="field-label" for="order-code">Kode</label>
-          <div class="field-row">
-            <input
-              class="secret-input"
-              id="order-code"
-              name="order-code"
-              type="password"
-              autocomplete="off"
-              placeholder="Skriv inn koden"
-            >
-            <button class="unlock-button order-unlock-button" type="submit">&Aring;pne bestilling</button>
-          </div>
-          <p class="error-message" id="order-error" hidden aria-live="polite">Feil kode &#10084;&#65039; pr&oslash;v igjen</p>
-        </form>
       </section>
     </div>
   </div>

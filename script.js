@@ -1,9 +1,11 @@
 "use strict";
 
-// Enkel klientbeskyttelse: koden ligger i klienten og er ikke ekte sikkerhet.
-const SECRET_CODE = "Linda1976";
-const ORDER_ACCESS_STORAGE_KEY = "orderAccessGranted";
-const ORDER_ACCESS_STORAGE_VALUE = "granted";
+// Dette er enkel klientbeskyttelse, ikke ekte sikkerhet.
+const LOGIN_USERNAME = "Linda";
+const LOGIN_PASSWORD = "Linda1976";
+const LOGIN_STORAGE_KEY = "siteLoginGranted";
+const LOGIN_STORAGE_VALUE = "granted";
+const LOGIN_ERROR_MESSAGE = "Feil brukernavn eller passord \u2764\uFE0F";
 const ORDER_PAGE_PATH = "bestilling.html";
 const RELATIONSHIP_START = new Date(2026, 0, 19, 20, 0, 0);
 const BIRTHDAY_MONTH_INDEX = 9;
@@ -59,6 +61,12 @@ const milestones = milestoneDefinitions.map((milestone) => ({
 }));
 
 const elements = {
+  loginShell: document.getElementById("login-shell"),
+  siteContent: document.getElementById("site-content"),
+  loginForm: document.getElementById("login-form"),
+  loginUsername: document.getElementById("login-username"),
+  loginPassword: document.getElementById("login-password"),
+  loginError: document.getElementById("login-error"),
   relationshipStartText: document.getElementById("relationship-start-text"),
   relationshipStatus: document.getElementById("relationship-status"),
   relationshipDays: document.getElementById("relationship-days"),
@@ -67,18 +75,10 @@ const elements = {
   relationshipSeconds: document.getElementById("relationship-seconds"),
   secretButton: document.getElementById("secret-button"),
   orderButton: document.getElementById("order-button"),
+  logoutButton: document.getElementById("logout-button"),
   modal: document.getElementById("secret-modal"),
   modalClose: document.getElementById("modal-close"),
-  unlockView: document.getElementById("unlock-view"),
   secretView: document.getElementById("secret-view"),
-  secretForm: document.getElementById("secret-form"),
-  secretInput: document.getElementById("secret-code"),
-  secretError: document.getElementById("secret-error"),
-  orderModal: document.getElementById("order-modal"),
-  orderModalClose: document.getElementById("order-modal-close"),
-  orderForm: document.getElementById("order-form"),
-  orderInput: document.getElementById("order-code"),
-  orderError: document.getElementById("order-error"),
   birthdayDate: document.getElementById("birthday-date"),
   birthdayDays: document.getElementById("birthday-days"),
   birthdayHours: document.getElementById("birthday-hours"),
@@ -94,7 +94,9 @@ const elements = {
   milestoneList: document.getElementById("milestone-list")
 };
 
-elements.relationshipStartText.textContent = shortDateTimeFormatter.format(RELATIONSHIP_START);
+if (elements.relationshipStartText) {
+  elements.relationshipStartText.textContent = shortDateTimeFormatter.format(RELATIONSHIP_START);
+}
 
 function addDays(date, days) {
   return new Date(
@@ -407,20 +409,95 @@ function updateFlowerReminder(now) {
     : daysRemaining + " " + pluralize(daysRemaining, "dag", "dager") + " igjen.";
 }
 
-function resetSecretState() {
-  elements.secretForm.reset();
-  elements.secretError.hidden = true;
-  elements.unlockView.hidden = false;
-  elements.secretView.hidden = true;
+function hasLoginAccess() {
+  try {
+    return window.sessionStorage.getItem(LOGIN_STORAGE_KEY) === LOGIN_STORAGE_VALUE;
+  } catch (error) {
+    return false;
+  }
+}
+
+function storeLoginAccess() {
+  try {
+    window.sessionStorage.setItem(LOGIN_STORAGE_KEY, LOGIN_STORAGE_VALUE);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function clearLoginAccess() {
+  try {
+    window.sessionStorage.removeItem(LOGIN_STORAGE_KEY);
+  } catch (error) {
+    // Ingen ekstra handling hvis sessionStorage ikke er tilgjengelig.
+  }
+}
+
+function showLoginError(message) {
+  elements.loginError.textContent = message;
+  elements.loginError.hidden = false;
+}
+
+function resetLoginError() {
+  elements.loginError.textContent = LOGIN_ERROR_MESSAGE;
+  elements.loginError.hidden = true;
+}
+
+function applyLoginState(isLoggedIn) {
+  document.documentElement.classList.toggle("has-login-access", isLoggedIn);
+
+  if (isLoggedIn) {
+    resetLoginError();
+    elements.loginForm.reset();
+    return;
+  }
+
+  closeModal();
+  resetLoginError();
+  window.setTimeout(() => {
+    elements.loginUsername.focus();
+  }, 20);
+}
+
+function handleLoginSubmit(event) {
+  event.preventDefault();
+  resetLoginError();
+
+  const username = elements.loginUsername.value.trim();
+  const password = elements.loginPassword.value;
+
+  if (username !== LOGIN_USERNAME || password !== LOGIN_PASSWORD) {
+    showLoginError(LOGIN_ERROR_MESSAGE);
+    elements.loginPassword.select();
+    return;
+  }
+
+  if (!storeLoginAccess()) {
+    showLoginError("Kunne ikke lagre innlogging i denne nettleser\u00F8kten.");
+    return;
+  }
+
+  applyLoginState(true);
+}
+
+function handleLogout() {
+  clearLoginAccess();
+  elements.loginForm.reset();
+  applyLoginState(false);
 }
 
 function openModal() {
-  resetSecretState();
+  if (!hasLoginAccess()) {
+    applyLoginState(false);
+    return;
+  }
+
   elements.modal.classList.add("is-open");
   elements.modal.setAttribute("aria-hidden", "false");
   document.body.classList.add("is-modal-open");
   window.setTimeout(() => {
-    elements.secretInput.focus();
+    elements.modalClose.focus();
   }, 20);
 }
 
@@ -428,61 +505,15 @@ function closeModal() {
   elements.modal.classList.remove("is-open");
   elements.modal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("is-modal-open");
-  resetSecretState();
 }
 
-function resetOrderState() {
-  elements.orderForm.reset();
-  elements.orderError.hidden = true;
-}
-
-function openOrderModal() {
-  resetOrderState();
-  elements.orderModal.classList.add("is-open");
-  elements.orderModal.setAttribute("aria-hidden", "false");
-  document.body.classList.add("is-modal-open");
-  window.setTimeout(() => {
-    elements.orderInput.focus();
-  }, 20);
-}
-
-function closeOrderModal() {
-  elements.orderModal.classList.remove("is-open");
-  elements.orderModal.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("is-modal-open");
-  resetOrderState();
-}
-
-function grantOrderAccess() {
-  try {
-    window.sessionStorage.setItem(ORDER_ACCESS_STORAGE_KEY, ORDER_ACCESS_STORAGE_VALUE);
-  } catch (error) {
-    // Hvis sessionStorage ikke er tilgjengelig, fortsetter vi likevel til den statiske siden.
-  }
-}
-
-function unlockSecret(inputCode) {
-  if (inputCode.trim() !== SECRET_CODE) {
-    elements.secretError.hidden = false;
-    elements.secretInput.select();
+function openOrderPage() {
+  if (!hasLoginAccess()) {
+    applyLoginState(false);
     return;
   }
 
-  elements.secretError.hidden = true;
-  elements.unlockView.hidden = true;
-  elements.secretView.hidden = false;
-}
-
-function unlockOrder(inputCode) {
-  if (inputCode.trim() !== SECRET_CODE) {
-    elements.orderError.hidden = false;
-    elements.orderInput.select();
-    return;
-  }
-
-  elements.orderError.hidden = true;
-  grantOrderAccess();
-  window.location.href = ORDER_PAGE_PATH;
+  window.location.assign(ORDER_PAGE_PATH);
 }
 
 function updatePage() {
@@ -493,38 +524,22 @@ function updatePage() {
   updateFlowerReminder(now);
 }
 
+elements.loginForm.addEventListener("submit", handleLoginSubmit);
+elements.logoutButton.addEventListener("click", handleLogout);
 elements.secretButton.addEventListener("click", openModal);
-elements.orderButton.addEventListener("click", openOrderModal);
+elements.orderButton.addEventListener("click", openOrderPage);
 elements.modalClose.addEventListener("click", closeModal);
-elements.orderModalClose.addEventListener("click", closeOrderModal);
-elements.secretForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  unlockSecret(elements.secretInput.value);
-});
-elements.orderForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  unlockOrder(elements.orderInput.value);
-});
 elements.modal.addEventListener("click", (event) => {
   if (event.target === elements.modal) {
     closeModal();
   }
 });
-elements.orderModal.addEventListener("click", (event) => {
-  if (event.target === elements.orderModal) {
-    closeOrderModal();
-  }
-});
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && elements.modal.classList.contains("is-open")) {
     closeModal();
-    return;
-  }
-
-  if (event.key === "Escape" && elements.orderModal.classList.contains("is-open")) {
-    closeOrderModal();
   }
 });
 
+applyLoginState(hasLoginAccess());
 updatePage();
 window.setInterval(updatePage, 1000);

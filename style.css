@@ -37,6 +37,18 @@ body {
     linear-gradient(160deg, var(--bg-top) 0%, var(--bg-mid) 46%, var(--bg-bottom) 100%);
 }
 
+html:not(.has-login-access) #site-content {
+  display: none;
+}
+
+html.has-login-access #login-shell {
+  display: none;
+}
+
+html:not(.has-login-access) body.order-protected-page {
+  visibility: hidden;
+}
+
 body.is-modal-open {
   overflow: hidden;
 }
@@ -54,7 +66,21 @@ select {
   overflow: hidden;
 }
 
+.login-shell {
+  position: relative;
+  isolation: isolate;
+}
+
 .container {
+  width: min(68rem, calc(100% - 1.5rem));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 1.5rem 0;
+  display: grid;
+  place-items: center;
+}
+
+.login-container {
   width: min(68rem, calc(100% - 1.5rem));
   min-height: 100vh;
   margin: 0 auto;
@@ -297,6 +323,7 @@ h3 {
 .unlock-button,
 .order-button,
 .order-submit-button,
+.logout-button,
 .back-link {
   border: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -321,8 +348,18 @@ h3 {
   font-weight: 700;
 }
 
+.logout-button {
+  padding: 0.9rem 1.3rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--rose-deep);
+  box-shadow: 0 12px 24px rgba(116, 53, 65, 0.1);
+  font-weight: 700;
+}
+
 .order-button,
 .order-submit-button,
+.logout-button,
 .back-link {
   cursor: pointer;
 }
@@ -333,6 +370,8 @@ h3 {
 .order-button:focus-visible,
 .order-submit-button:hover,
 .order-submit-button:focus-visible,
+.logout-button:hover,
+.logout-button:focus-visible,
 .back-link:hover,
 .back-link:focus-visible,
 .unlock-button:hover,
@@ -348,6 +387,32 @@ h3 {
 
 .tiny-note {
   font-size: 0.95rem;
+}
+
+.login-card {
+  width: min(100%, 34rem);
+}
+
+.login-form {
+  max-width: 28rem;
+  margin-top: 1.6rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.login-actions {
+  display: grid;
+  gap: 0.85rem;
+  justify-items: start;
+}
+
+.login-note,
+.order-security-note {
+  max-width: 34rem;
+}
+
+.order-security-note {
+  text-align: center;
 }
 
 .modal-backdrop {
@@ -877,6 +942,11 @@ h3 {
     padding: 1rem 0;
   }
 
+  .login-container {
+    width: min(100% - 1rem, 68rem);
+    padding: 1rem 0;
+  }
+
   .hero-card {
     border-radius: 28px;
   }
@@ -939,7 +1009,8 @@ h3 {
   }
 
   .back-link,
-  .order-submit-button {
+  .order-submit-button,
+  .logout-button {
     width: 100%;
     justify-content: center;
   }

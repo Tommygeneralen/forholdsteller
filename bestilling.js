@@ -1,49 +1,55 @@
 "use strict";
 
-const FORM_ENDPOINT = "https://formspree.io/f/xvzllqby";
-// Enkel klientbeskyttelse: dette er bare en lett sperre for en statisk side, ikke ekte sikkerhet.
-const ORDER_ACCESS_STORAGE_KEY = "orderAccessGranted";
-const ORDER_ACCESS_STORAGE_VALUE = "granted";
+// Dette er enkel klientbeskyttelse, ikke ekte sikkerhet.
+const LOGIN_STORAGE_KEY = "siteLoginGranted";
+const LOGIN_STORAGE_VALUE = "granted";
 const ORDER_LOCK_REDIRECT = "index.html";
-const FORM_ENDPOINT_PLACEHOLDER = "LEGG_INN_FORMSPREE_URL_HER";
+const FORM_ENDPOINT = "https://formspree.io/f/xvzllqby";
 
 (function initOrderPage() {
-  if (!hasOrderAccess()) {
+  if (!hasLoginAccess()) {
     window.location.replace(ORDER_LOCK_REDIRECT);
     return;
   }
 
   const elements = {
     form: document.getElementById("order-request-form"),
+    firstName: document.getElementById("fornavn"),
     date: document.getElementById("dato"),
+    time: document.getElementById("klokkeslett"),
     preview: document.getElementById("selection-preview"),
-    configMessage: document.getElementById("config-message"),
     formStatus: document.getElementById("form-status"),
     submitButton: document.getElementById("submit-order-button"),
     selectedServicesField: document.getElementById("selected-services-field"),
     selectedDetailsField: document.getElementById("selected-details-field"),
     orderSummaryField: document.getElementById("order-summary-field"),
-    serviceCards: Array.from(document.querySelectorAll("[data-service-card]"))
+    serviceCards: Array.from(document.querySelectorAll("[data-service-card]")),
+    serviceInputs: Array.from(document.querySelectorAll('input[name="services[]"]'))
   };
-
-  const formEndpointConfigured = isFormEndpointConfigured();
 
   if (!elements.form) {
     return;
   }
 
-  if (!formEndpointConfigured) {
-    showStatus(elements.configMessage, "E-postl\u00F8sning er ikke konfigurert enn\u00E5.", "info");
-  }
+  lockFormEndpoint(elements.form);
+  setDateMinimum(elements.date);
+  setupRequiredValidation(elements);
 
   elements.form.addEventListener("change", () => {
     syncServiceCards(elements.serviceCards);
     updateChoiceChipStates();
     refreshSelectionState(elements);
+    syncValidationState(elements);
+  });
+
+  elements.form.addEventListener("input", () => {
+    syncValidationState(elements);
   });
 
   elements.form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    hideStatus(elements.formStatus);
+    syncValidationState(elements);
 
     if (!elements.form.reportValidity()) {
       return;
@@ -52,18 +58,12 @@ const FORM_ENDPOINT_PLACEHOLDER = "LEGG_INN_FORMSPREE_URL_HER";
     const selections = buildSelections();
 
     if (selections.length === 0) {
-      showStatus(elements.formStatus, "Velg minst en tjeneste f\u00F8r du sender bestillingen.", "error");
-      return;
-    }
-
-    if (!formEndpointConfigured) {
-      showStatus(elements.formStatus, "E-postl\u00F8sning er ikke konfigurert enn\u00E5.", "error");
+      showStatus(elements.formStatus, "Velg minst en tjeneste eller meny f\u00F8r du sender bestillingen.", "error");
       return;
     }
 
     populateHiddenFields(elements, selections);
-    setSubmitState(elements.submitButton, true, formEndpointConfigured);
-    hideStatus(elements.formStatus);
+    setSubmitState(elements.submitButton, true);
 
     try {
       const formData = new FormData(elements.form);
@@ -83,32 +83,33 @@ const FORM_ENDPOINT_PLACEHOLDER = "LEGG_INN_FORMSPREE_URL_HER";
       syncServiceCards(elements.serviceCards);
       updateChoiceChipStates();
       refreshSelectionState(elements);
+      syncValidationState(elements);
       showStatus(elements.formStatus, "Bestillingen er sendt \u2764\uFE0F", "success");
     } catch (error) {
       showStatus(elements.formStatus, "Kunne ikke sende bestillingen akkurat n\u00E5. Pr\u00F8v igjen senere.", "error");
     } finally {
-      setSubmitState(elements.submitButton, false, formEndpointConfigured);
+      setSubmitState(elements.submitButton, false);
     }
   });
 
-  setDateMinimum(elements.date);
-  setSubmitState(elements.submitButton, false, formEndpointConfigured);
+  setSubmitState(elements.submitButton, false);
   syncServiceCards(elements.serviceCards);
   updateChoiceChipStates();
   refreshSelectionState(elements);
+  syncValidationState(elements);
 })();
 
-function hasOrderAccess() {
+function hasLoginAccess() {
   try {
-    return window.sessionStorage.getItem(ORDER_ACCESS_STORAGE_KEY) === ORDER_ACCESS_STORAGE_VALUE;
+    return window.sessionStorage.getItem(LOGIN_STORAGE_KEY) === LOGIN_STORAGE_VALUE;
   } catch (error) {
     return false;
   }
 }
 
-function isFormEndpointConfigured() {
-  const endpoint = FORM_ENDPOINT.trim();
-  return endpoint !== "" && endpoint !== FORM_ENDPOINT_PLACEHOLDER;
+function lockFormEndpoint(form) {
+  form.action = FORM_ENDPOINT;
+  form.method = "POST";
 }
 
 function setDateMinimum(dateInput) {
@@ -120,6 +121,35 @@ function setDateMinimum(dateInput) {
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
   dateInput.min = today.getFullYear() + "-" + month + "-" + day;
+}
+
+function setupRequiredValidation(elements) {
+  attachRequiredValidation(elements.firstName, "Fornavn m\u00E5 fylles ut.");
+  attachRequiredValidation(elements.date, "Dato m\u00E5 fylles ut.");
+  attachRequiredValidation(elements.time, "Klokkeslett m\u00E5 fylles ut.");
+}
+
+function attachRequiredValidation(input, message) {
+  if (!input) {
+    return;
+  }
+
+  const update = () => {
+    input.setCustomValidity(input.value.trim() ? "" : message);
+  };
+
+  input.addEventListener("input", update);
+  input.addEventListener("change", update);
+  update();
+}
+
+function syncValidationState(elements) {
+  const hasSelectedService = elements.serviceInputs.some((input) => input.checked);
+  const selectionMessage = hasSelectedService ? "" : "Velg minst en tjeneste eller meny.";
+
+  elements.serviceInputs.forEach((input, index) => {
+    input.setCustomValidity(index === 0 ? selectionMessage : "");
+  });
 }
 
 function syncServiceCards(serviceCards) {
@@ -294,12 +324,12 @@ function renderPreview(previewElement, selections) {
   });
 }
 
-function setSubmitState(button, isSubmitting, formEndpointConfigured) {
+function setSubmitState(button, isSubmitting) {
   if (!button) {
     return;
   }
 
-  button.disabled = isSubmitting || !formEndpointConfigured;
+  button.disabled = isSubmitting;
   button.textContent = isSubmitting ? "Sender..." : "Send bestilling";
 }
 

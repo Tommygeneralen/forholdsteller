@@ -4,10 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bestill noe fint | Verdensfineste</title>
+  <script>
+    // Dette er enkel klientbeskyttelse, ikke ekte sikkerhet.
+    (function () {
+      try {
+        if (window.sessionStorage.getItem("siteLoginGranted") !== "granted") {
+          window.location.replace("index.html");
+          return;
+        }
+
+        document.documentElement.classList.add("has-login-access");
+      } catch (error) {
+        window.location.replace("index.html");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
   <script src="bestilling.js" defer></script>
 </head>
-<body>
+<body class="order-protected-page">
   <div class="floating-hearts" aria-hidden="true">
     <span class="heart heart-1">&hearts;</span>
     <span class="heart heart-2">&hearts;</span>
@@ -27,9 +42,15 @@
           Velg det du &oslash;nsker, dato og tid, s&aring; sendes bestillingen.
         </p>
 
-        <form class="order-request-form" id="order-request-form">
+        <form
+          class="order-request-form"
+          id="order-request-form"
+          action="https://formspree.io/f/xvzllqby"
+          method="post"
+          accept-charset="UTF-8"
+          autocomplete="off"
+        >
           <input type="hidden" name="_subject" value="Ny bestilling fra nettsiden">
-          <input type="hidden" name="mottaker" value="t-nyste@online.no">
           <input type="hidden" name="valgte_tjenester" id="selected-services-field">
           <input type="hidden" name="undervalg" id="selected-details-field">
           <input type="hidden" name="bestillingoversikt" id="order-summary-field">
@@ -46,18 +67,18 @@
 
               <label class="form-field" for="fornavn">
                 <span class="field-label">Fornavn</span>
-                <input class="text-input" id="fornavn" name="fornavn" type="text" required>
+                <input class="text-input" id="fornavn" name="fornavn" type="text" autocomplete="off" required>
               </label>
 
               <div class="field-cluster">
                 <label class="form-field" for="dato">
                   <span class="field-label">Dato</span>
-                  <input class="text-input" id="dato" name="dato" type="date" required>
+                  <input class="text-input" id="dato" name="dato" type="date" autocomplete="off" required>
                 </label>
 
                 <label class="form-field" for="klokkeslett">
                   <span class="field-label">Klokkeslett</span>
-                  <input class="text-input" id="klokkeslett" name="klokkeslett" type="time" required>
+                  <input class="text-input" id="klokkeslett" name="klokkeslett" type="time" autocomplete="off" required>
                 </label>
               </div>
 
@@ -86,7 +107,6 @@
                 <li class="summary-empty">Ingen tjenester valgt enn&aring;.</li>
               </ul>
 
-              <div class="status-message is-info" id="config-message" hidden aria-live="polite"></div>
               <div class="status-message" id="form-status" hidden aria-live="polite"></div>
             </section>
           </div>
@@ -256,11 +276,11 @@
           </section>
 
           <div class="submit-row">
-            <p class="tiny-note">
-              Bestillingen sendes til <strong>t-nyste@online.no</strong> via Formspree n&aring;r endepunktet er lagt inn.
-            </p>
+            <p class="tiny-note">Bestillingen sendes via Formspree.</p>
             <button class="order-submit-button" id="submit-order-button" type="submit">Send bestilling</button>
           </div>
+
+          <p class="tiny-note order-security-note">Denne siden bruker enkel tilgangskode. Ikke send sensitiv informasjon.</p>
         </form>
       </section>
     </main>
